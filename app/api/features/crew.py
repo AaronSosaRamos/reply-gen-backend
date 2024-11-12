@@ -2,10 +2,13 @@ from app.api.features.agents.reply_gen_agents import CustomAgents
 from app.api.features.tasks.reply_gen_tasks import CustomTasks
 from app.api.schemas.schema import FinalEmailSchema
 from crewai import Crew
+from langchain_core.output_parsers import JsonOutputParser
 
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
+
+json_parser = JsonOutputParser(pydantic_object=FinalEmailSchema)
 
 class EmailGeneratorCrew:
     def __init__(self):
@@ -44,4 +47,4 @@ class EmailGeneratorCrew:
 
         result = crew.kickoff()
 
-        return {**state, "email_output": result}
+        return {**state, "email_output": json_parser.parse(result.raw)}
